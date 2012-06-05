@@ -1,7 +1,8 @@
 class postgresql::server($version='8.4',
                          $listen_addresses='localhost',
                          $max_connections=100,
-                         $shared_buffers='24MB') {
+                         $shared_buffers='24MB',
+                         $package_to_install = '') {
   class { 'postgresql::client':
     version => $version,
   }
@@ -12,7 +13,11 @@ class postgresql::server($version='8.4',
     default => "postgresql-${version}",
   }
 
-  package { "postgresql-${version}":
+  if ${package_to_install} == '' {
+	$package_to_install = "postgresql-${version}"
+  }
+
+  package { "${package_to_install}":
     ensure => present,
   }
 
