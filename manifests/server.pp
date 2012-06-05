@@ -2,7 +2,22 @@ class postgresql::server ($version = '8.4',
 	$listen_addresses = 'localhost',
 	$max_connections = 100,
 	$shared_buffers = '24MB',
-	$package_to_install = '') {
+	$package_to_install = '',
+	$clean = false) {
+	$confpath = $::operatingsystem ? {
+			'redhat' => "/var/lib/pgsql/data",
+			'centos' => "/var/lib/pgsql/data",
+			default => "/etc/postgresql/${version}/main",
+		}
+	
+	if $clean {
+		exec { "cleanup_before_installation" :
+			command => "rm -rf $confpath",
+			path => ["/bin", "/sbin"],
+			cwd => "/var",
+		}		
+	}
+	
 	class {
 		'postgresql::client' :
 			version => $version,
@@ -27,11 +42,7 @@ class postgresql::server ($version = '8.4',
 		owner => 'postgres',
 		group => 'postgres',
 	}
-	$confpath = $::operatingsystem ? {
-			'redhat' => "/var/lib/pgsql/data",
-			'centos' => "/var/lib/pgsql/data",
-			default => "/etc/postgresql/${version}/main",
-		}
+	
 	
 	file {
 		'pg_hba.conf' :
@@ -42,8 +53,7 @@ class postgresql::server ($version = '8.4',
 	}
 	file {
 		'postgresql.conf' :
-			path => "$confpath/postgresql.conf",
-			content => template('postgresql/postgresql.conf.erb'),
+			path => "$confpath/postgresql.conf",			
 			require => Package[$pkgname],
 	}
 	service {
