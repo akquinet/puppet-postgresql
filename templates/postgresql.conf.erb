@@ -37,17 +37,17 @@
 
 # The default values of these variables are driven from the -D command-line
 # option or PGDATA environment variable, represented here as ConfigDir.
-
-data_directory = '/var/lib/postgresql/<%= version %>/main'		# use data in another directory
-					# (change requires restart)
-          hba_file = '/etc/postgresql/<%= version %>/main/pg_hba.conf'	# host-based authentication file
-					# (change requires restart)
-          ident_file = '/etc/postgresql/<%= version %>/main/pg_ident.conf'	# ident configuration file
-					# (change requires restart)
+data_directory = '/media/DB/pgsql-data'
+#data_directory = 'ConfigDir'           # use data in another directory
+                                        # (change requires restart)
+#hba_file = 'ConfigDir/pg_hba.conf'     # host-based authentication file
+                                        # (change requires restart)
+#ident_file = 'ConfigDir/pg_ident.conf' # ident configuration file
+                                        # (change requires restart)
 
 # If external_pid_file is not explicitly set, no extra PID file is written.
-external_pid_file = '/var/run/postgresql/<%= version %>-main.pid'		# write an extra PID file
-					# (change requires restart)
+#external_pid_file = '(none)'           # write an extra PID file
+                                        # (change requires restart)
 
 
 #------------------------------------------------------------------------------
@@ -56,11 +56,11 @@ external_pid_file = '/var/run/postgresql/<%= version %>-main.pid'		# write an ex
 
 # - Connection Settings -
 
-listen_addresses = <%= listen_addresses %>		# what IP address(es) to listen on;
-					# comma-separated list of addresses;
-					# defaults to 'localhost', '*' = all
-					# (change requires restart)
-port = 5432				# (change requires restart)
+#listen_addresses = 'localhost'         # what IP address(es) to listen on;
+                                        # comma-separated list of addresses;
+                                        # defaults to 'localhost', '*' = all
+                                        # (change requires restart)
+#port = 5432                            # (change requires restart)
 max_connections = <%= max_connections %>			# (change requires restart)
 # Note:  Increasing max_connections costs ~400 bytes of shared memory per 
 # connection slot, plus lock space (see max_locks_per_transaction).

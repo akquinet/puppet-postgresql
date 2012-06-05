@@ -27,16 +27,22 @@ class postgresql::server ($version = '8.4',
 		owner => 'postgres',
 		group => 'postgres',
 	}
+	$confpath = $::operatingsystem ? {
+			'redhat' => "/var/lib/pgsql/data",
+			'centos' => "/var/lib/pgsql/data",
+			default => "/etc/postgresql/${version}/main",
+		}
+	
 	file {
 		'pg_hba.conf' :
-			path => "/etc/postgresql/${version}/main/pg_hba.conf",
+			path => "$confpath/pg_hba.conf",
 			source => 'puppet:///modules/postgresql/pg_hba.conf',
 			mode => '0640',
 			require => Package[$pkgname],
 	}
 	file {
 		'postgresql.conf' :
-			path => "/etc/postgresql/${version}/main/postgresql.conf",
+			path => "$confpath/postgresql.conf",
 			content => template('postgresql/postgresql.conf.erb'),
 			require => Package[$pkgname],
 	}
