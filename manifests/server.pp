@@ -10,14 +10,6 @@ class postgresql::server ($version = '8.4',
 			default => "/etc/postgresql/${version}/main",
 		}
 	
-	if $clean {
-		exec { "cleanup_before_installation" :
-			command => "rm -rf $confpath",
-			path => ["/bin", "/sbin"],
-			cwd => "/var",
-		}		
-	}
-	
 	class {
 		'postgresql::client' :
 			version => $version,
@@ -56,6 +48,15 @@ class postgresql::server ($version = '8.4',
 			path => "$confpath/postgresql.conf",			
 			require => Package[$pkgname],
 	}
+	if $clean {
+		exec { "reinitialize pgsql-server" :
+			command => "rm -rf $confpath ; /etc/init.d/postgresql initdb",
+			path => ["/bin", "/sbin"],
+			cwd => "/var",
+			require => Package[$pkgname],
+		}
+	}
+	
 	service {
 		"postgresql" :
 			ensure => running,
