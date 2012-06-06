@@ -8,6 +8,7 @@ define postgresql::user($ensure=present) {
       command => "createuser --no-superuser --no-createdb --no-createrole ${name}",
       user    => 'postgres',
       unless  => $userexists,
+      path => ["/bin", "/sbin", "/usr/bin"],
       require => Class['postgresql::server'],
     }
 
@@ -16,6 +17,7 @@ define postgresql::user($ensure=present) {
     exec { "dropuser ${name}":
       command => "dropuser ${name}",
       user    => 'postgres',
+      path => ["/bin", "/sbin", "/usr/bin"],
       onlyif  => "$userexists && $user_owns_zero_databases",
     }
   }
