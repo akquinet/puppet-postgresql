@@ -11,6 +11,7 @@ define postgresql::database($owner, $charset='UTF8', $ensure=present) {
       command => "createdb -O ${owner} -E ${charset} ${name}",
       user    => 'postgres',
       unless  => $dbexists,
+      path => ["/bin", "/sbin", "/usr/bin"],
       require => Postgresql::User[$owner],
     }
 
@@ -21,6 +22,7 @@ define postgresql::database($owner, $charset='UTF8', $ensure=present) {
       command => "dropdb ${name}",
       user    => 'postgres',
       onlyif  => $dbexists,
+      path => ["/bin", "/sbin", "/usr/bin"],
       before  => Postgresql::User[$owner],
     }
   }
