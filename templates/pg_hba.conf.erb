@@ -85,6 +85,6 @@ local   all         postgres                          ident
 ##### IPv6 local connections:
 ####host    all         all         ::1/128               ident
 ## access rules added by puppet
-<% $pg_hba_access_rules.each do |rule| -%>
+<% pg_hba_access_rules.each do |rule| -%>
 <%= rule %>
 <% end -%>
