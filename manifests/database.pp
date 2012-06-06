@@ -1,10 +1,6 @@
 define postgresql::database($owner, $charset='UTF8', $ensure=present) {
   $dbexists = "psql -ltA | grep '^${name}|'"
 
-  postgresql::user { $owner:
-    ensure => $ensure,
-  }
-
   if $ensure == 'present' {
 
     exec { "createdb $name":
