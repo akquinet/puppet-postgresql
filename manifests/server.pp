@@ -60,7 +60,7 @@ class postgresql::server ($version = '8.4',
 		'pg_hba.conf' :
 			path => "$confpath/pg_hba.conf",
 			source => 'puppet:///modules/postgresql/pg_hba.conf',
-			content => 'puppet:///modules/postgresql/pg_hba.conf.erb',
+			content => template('postgresql/pg_hba.conf.erb'),
 			mode => '0640',
 			require => [Package[$pkgname],Exec["reinitialize_pgsql_server"]]
 	}
