@@ -92,7 +92,7 @@ class postgresql::server ($version = '8.4',
 	}
 
 	##postgresql.conf prepare vars end#
-	case $operationsystem {
+	case $::operatingsystem {
 		redhat, centos : {
 			$os_conf_file_suffix = '.rhel'
 		}
