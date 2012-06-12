@@ -37,16 +37,17 @@
 
 # The default values of these variables are driven from the -D command-line
 # option or PGDATA environment variable, represented here as ConfigDir.
-#data_directory = 'ConfigDir'           # use data in another directory
-                                        # (change requires restart)
-#hba_file = 'ConfigDir/pg_hba.conf'     # host-based authentication file
-                                        # (change requires restart)
-#ident_file = 'ConfigDir/pg_ident.conf' # ident configuration file
-                                        # (change requires restart)
+
+#data_directory = 'ConfigDir'		# use data in another directory
+					# (change requires restart)
+#hba_file = 'ConfigDir/pg_hba.conf'	# host-based authentication file
+					# (change requires restart)
+#ident_file = 'ConfigDir/pg_ident.conf'	# ident configuration file
+					# (change requires restart)
 
 # If external_pid_file is not explicitly set, no extra PID file is written.
-#external_pid_file = '(none)'           # write an extra PID file
-                                        # (change requires restart)
+#external_pid_file = '(none)'		# write an extra PID file
+					# (change requires restart)
 
 
 #------------------------------------------------------------------------------
@@ -55,16 +56,16 @@
 
 # - Connection Settings -
 
-#listen_addresses = 'localhost'         # what IP address(es) to listen on;
-                                        # comma-separated list of addresses;
-                                        # defaults to 'localhost', '*' = all
-                                        # (change requires restart)
-#port = 5432                            # (change requires restart)
+#listen_addresses = 'localhost'		# what IP address(es) to listen on;
+					# comma-separated list of addresses;
+					# defaults to 'localhost', '*' = all
+					# (change requires restart)
+#port = 5432				# (change requires restart)
 max_connections = <%= conf_max_connections_value %>			# (change requires restart)
 # Note:  Increasing max_connections costs ~400 bytes of shared memory per 
 # connection slot, plus lock space (see max_locks_per_transaction).
 #superuser_reserved_connections = 3	# (change requires restart)
-unix_socket_directory = '/var/run/postgresql'		# (change requires restart)
+#unix_socket_directory = ''		# (change requires restart)
 #unix_socket_group = ''			# (change requires restart)
 #unix_socket_permissions = 0777		# begin with 0 to use octal notation
 					# (change requires restart)
@@ -74,7 +75,7 @@ unix_socket_directory = '/var/run/postgresql'		# (change requires restart)
 # - Security and Authentication -
 
 #authentication_timeout = 1min		# 1s-600s
-ssl = true				# (change requires restart)
+#ssl = off				# (change requires restart)
 #ssl_ciphers = 'ALL:!ADH:!LOW:!EXP:!MD5:@STRENGTH'	# allowed SSL ciphers
 					# (change requires restart)
 #ssl_renegotiation_limit = 512MB	# amount of data between renegotiations
@@ -106,7 +107,7 @@ ssl = true				# (change requires restart)
 shared_buffers = <%= conf_shared_buffers_value %>			# min 128kB
 					# (change requires restart)
 #temp_buffers = 8MB			# min 800kB
-#max_prepared_transactions = 0		# zero disables the feature
+<%= cfg_max_prepared_transactions %>max_prepared_transactions = <%= conf_max_prepared_transactions_value %>		# zero disables the feature
 					# (change requires restart)
 # Note:  Increasing max_prepared_transactions costs ~600 bytes of shared memory
 # per transaction slot, plus lock space (see max_locks_per_transaction).
@@ -152,7 +153,7 @@ shared_buffers = <%= conf_shared_buffers_value %>			# min 128kB
 #wal_sync_method = fsync		# the default is the first option 
 					# supported by the operating system:
 					#   open_datasync
-					#   fdatasync
+					#   fdatasync (default on Linux)
 					#   fsync
 					#   fsync_writethrough
 					#   open_sync
@@ -236,17 +237,17 @@ shared_buffers = <%= conf_shared_buffers_value %>			# min 128kB
 					# requires logging_collector to be on.
 
 # This is used when logging to stderr:
-#logging_collector = off		# Enable capturing of stderr and csvlog
+logging_collector = on			# Enable capturing of stderr and csvlog
 					# into log files. Required to be on for
 					# csvlogs.
 					# (change requires restart)
 
 # These are only used if logging_collector is on:
-#log_directory = 'pg_log'		# directory where log files are written,
+log_directory = 'pg_log'		# directory where log files are written,
 					# can be absolute or relative to PGDATA
-#log_filename = 'postgresql-%Y-%m-%d_%H%M%S.log'	# log file name pattern,
+log_filename = 'postgresql-%a.log'	# log file name pattern,
 					# can include strftime() escapes
-#log_truncate_on_rotation = off		# If on, an existing log file of the
+log_truncate_on_rotation = on		# If on, an existing log file of the
 					# same name as the new log file will be
 					# truncated rather than appended to.
 					# But such truncation only occurs on
@@ -254,9 +255,9 @@ shared_buffers = <%= conf_shared_buffers_value %>			# min 128kB
 					# or size-driven rotation.  Default is
 					# off, meaning append to existing files
 					# in all cases.
-#log_rotation_age = 1d			# Automatic rotation of logfiles will
+log_rotation_age = 1d			# Automatic rotation of logfiles will
 					# happen after that time.  0 disables.
-#log_rotation_size = 10MB		# Automatic rotation of logfiles will 
+log_rotation_size = 0			# Automatic rotation of logfiles will 
 					# happen after that much log output.
 					# 0 disables.
 
@@ -330,7 +331,7 @@ shared_buffers = <%= conf_shared_buffers_value %>			# min 128kB
 #log_disconnections = off
 #log_duration = off
 #log_hostname = off
-log_line_prefix = '%t '			# special values:
+#log_line_prefix = ''			# special values:
 					#   %u = user name
 					#   %d = database name
 					#   %r = remote host and port
@@ -364,7 +365,7 @@ log_line_prefix = '%t '			# special values:
 # - Query/Index Statistics Collector -
 
 #track_activities = on
-#track_counts = on
+<%= cfg_track_counts %>track_counts = <%= conf_track_counts_value %>
 #track_functions = none			# none, pl, all
 #track_activity_query_size = 1024
 #update_process_title = on
@@ -383,7 +384,7 @@ log_line_prefix = '%t '			# special values:
 # AUTOVACUUM PARAMETERS
 #------------------------------------------------------------------------------
 
-#autovacuum = on			# Enable autovacuum subprocess?  'on' 
+<%= cfg_autovacuum %>autovacuum = <%= conf_autovacuum_value %>			# Enable autovacuum subprocess?  'on' 
 					# requires track_counts to also be on.
 #log_autovacuum_min_duration = -1	# -1 disables, 0 logs all actions and
 					# their durations, > 0 logs only
