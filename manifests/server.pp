@@ -44,7 +44,7 @@ class postgresql::server ($version = '8.4',
 	if $clean {
 		exec {
 			"reinitialize_pgsql_server" :
-				command => "rm -rf $confpath ; /etc/init.d/postgresql initdb",
+				command => "/etc/init.d/postgresql stop; rm -rf $confpath ; /etc/init.d/postgresql initdb",
 				path => ["/bin", "/sbin"],
 				cwd => "/var",
 				require => Package[$pkgname],
