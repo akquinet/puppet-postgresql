@@ -42,9 +42,20 @@ class postgresql::server ($version = '8.4',
 		group => 'postgres',
 	}
 	if $clean {
+		case $version {
+			'9.2' : 
+				{
+					$initdSuffix = '-9.2'
+					
+					}
+				default :
+				{
+					$initdSuffix = ''
+				}
+		}
 		exec {
 			"reinitialize_pgsql_server" :
-				command => "/etc/init.d/postgresql stop; rm -rf $confpath ; /etc/init.d/postgresql initdb",
+				command => "/etc/init.d/postgresql$initdSuffix stop; rm -rf $confpath ; /etc/init.d/postgresql$initdSuffix initdb",
 				path => ["/bin", "/sbin"],
 				cwd => "/var",
 				require => Package[$pkgname],
