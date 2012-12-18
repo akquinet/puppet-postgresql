@@ -13,9 +13,14 @@ class postgresql::server ($version = '8.4',
 	$conf_max_prepared_transactions_value = '0',
 	$conf_max_connections_value = '100',
 	$conf_shared_buffers_value = '32MB') {
+	$confpathRHC = $version ? {
+		'9.2' => '/var/lib/pgsql/9.2/data',
+		default => '/var/lib/pgsql/data',
+	}
+	
 	$confpath = $::operatingsystem ? {
-		'redhat' => "/var/lib/pgsql/data",
-		'centos' => "/var/lib/pgsql/data",
+		'redhat' => "$confpathRHC",
+		'centos' => "$confpathRHC",
 		default => "/etc/postgresql/${version}/main",
 	}
 	class {
@@ -41,8 +46,7 @@ class postgresql::server ($version = '8.4',
 		owner => 'postgres',
 		group => 'postgres',
 	}
-	if $clean {
-		case $version {
+	case $version {
 			'9.2' : 
 				{
 					$initdSuffix = '-9.2'
@@ -53,6 +57,8 @@ class postgresql::server ($version = '8.4',
 					$initdSuffix = ''
 				}
 		}
+	
+	if $clean {
 		exec {
 			"reinitialize_pgsql_server" :
 				command => "/etc/init.d/postgresql$initdSuffix stop; rm -rf $confpath ; /etc/init.d/postgresql$initdSuffix initdb",
@@ -118,7 +124,7 @@ class postgresql::server ($version = '8.4',
 			require => [Package[$pkgname], Exec["reinitialize_pgsql_server"]]
 	}
 	service {
-		"postgresql" :
+		"postgresql$initdSuffix" :
 			ensure => running,
 			enable => true,
 			hasstatus => true,
