@@ -144,11 +144,16 @@ class postgresql::server ($version = '8.4',
 			$os_conf_file_suffix = ''
 		}
 	}
+	$conf_file_dir = $conf_data_dir ? {
+		'standard' => "$confpath",
+		default => "$conf_data_dir", 
+	}
+	
 	file {
 		'postgresql.conf' :
-			path => "$confpath/postgresql.conf",
+			path => "$conf_file_dir/postgresql.conf",
 			content => template("postgresql/postgresql.conf$os_conf_file_suffix.erb"),
-			require => [Package[$pkgname], Exec["reinitialize_pgsql_server"]]
+			require => [Package[$pkgname], Exec["reinitialize_pgsql_server","cp_recursively_data_dir"]]
 	}
 	
 	
