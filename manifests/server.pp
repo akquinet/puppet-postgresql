@@ -78,6 +78,24 @@ class postgresql::server ($version = '8.4',
 		$srv_subscriptions = [Package[$pkgname], File['pg_hba.conf'],
 		File['postgresql.conf']]
 	}
+	
+	case $conf_data_dir {
+		'standard' : {
+			exec {
+				"cp_recursively_data_dir" :
+				command => "/bin/echo 'nothing to do because standard configuration is used'",
+			}
+		}
+		default : {
+			exec {
+				"cp_recursively_data_dir" :
+				command => "/bin/cp -rf $confpath/data/* $conf_data_dir/ ; chown -R postgres:postgres $conf_data_dir ; chmod -R 700 $conf_data_dir ; sed -i 's/PGDATA=$confpath/PGDATA=$conf_data_dir/' /etc/init.d/postgresql$initdSuffix",
+				cwd => "$conf_data_dir",
+			}
+			
+		}
+	}
+	
 	$pghba_dir = $conf_pghba_dir ? {
 		'standard' => $confpath,
 		default => $conf_pghba_dir,
@@ -87,7 +105,7 @@ class postgresql::server ($version = '8.4',
 			path => "$pghba_dir/pg_hba.conf",
 			content => template('postgresql/pg_hba.conf.erb'),
 			mode => '0640',
-			require => [Package[$pkgname], Exec["reinitialize_pgsql_server"]]
+			require => [Package[$pkgname], Exec["reinitialize_pgsql_server","cp_recursively_data_dir"]]
 	}
 
 	##postgresql.conf prepare vars start#
@@ -125,6 +143,8 @@ class postgresql::server ($version = '8.4',
 			content => template("postgresql/postgresql.conf$os_conf_file_suffix.erb"),
 			require => [Package[$pkgname], Exec["reinitialize_pgsql_server"]]
 	}
+	
+	
 	service {
 		"postgresql$initdSuffix" :
 			ensure => running,
@@ -132,5 +152,6 @@ class postgresql::server ($version = '8.4',
 			hasstatus => true,
 			hasrestart => true,
 			subscribe => $srv_subscriptions,
+			require => Exec["cp_recursively_data_dir"],
 	}
 }

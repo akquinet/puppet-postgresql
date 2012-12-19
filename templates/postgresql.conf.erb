@@ -43,10 +43,10 @@
                                         # (change requires restart)
 #ident_file = 'ConfigDir/pg_ident.conf' # ident configuration file
                                         # (change requires restart)
-<% if ($conf_pghba_dir != 'standard') %>
+<% if conf_pghba_dir != "standard" %>
 hba_file = '<%= conf_pghba_dir %>/pg_hba.conf'
 <% end %>
-<% if ($conf_data_dir != 'standard') %>
+<% if conf_data_dir != "standard" %>
 data_directory = '<%= conf_data_dir %>'
 <% end %>
 
