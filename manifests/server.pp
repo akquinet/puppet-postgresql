@@ -89,7 +89,7 @@ class postgresql::server ($version = '8.4',
 		default : {
 			exec {
 				"cp_recursively_data_dir" :
-				command => "/bin/cp -rf $confpath/data/* $conf_data_dir/ ; chown -R postgres:postgres $conf_data_dir ; chmod -R 700 $conf_data_dir ; sed -i 's/PGDATA=$confpath/PGDATA=$conf_data_dir/' /etc/init.d/postgresql$initdSuffix",
+				command => "/bin/cp -rf $confpath/* $conf_data_dir/ ; chown -R postgres:postgres $conf_data_dir ; chmod -R 700 $conf_data_dir ; sed -i 's/PGDATA=$confpath/PGDATA=$conf_data_dir/' /etc/init.d/postgresql$initdSuffix",
 				cwd => "$conf_data_dir",
 			}
 			
