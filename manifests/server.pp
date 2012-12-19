@@ -12,12 +12,13 @@ class postgresql::server ($version = '8.4',
 	$conf_autovacuum_value = 'off',
 	$conf_max_prepared_transactions_value = '0',
 	$conf_max_connections_value = '100',
-	$conf_shared_buffers_value = '32MB') {
+	$conf_shared_buffers_value = '32MB',
+	$conf_data_dir = 'standard',
+	$conf_pghba_dir = 'standard',) {
 	$confpathRHC = $version ? {
 		'9.2' => '/var/lib/pgsql/9.2/data',
 		default => '/var/lib/pgsql/data',
 	}
-	
 	$confpath = $::operatingsystem ? {
 		'redhat' => "$confpathRHC",
 		'centos' => "$confpathRHC",
@@ -47,21 +48,18 @@ class postgresql::server ($version = '8.4',
 		group => 'postgres',
 	}
 	case $version {
-			'9.2' : 
-				{
-					$initdSuffix = '-9.2'
-					
-					}
-				default :
-				{
-					$initdSuffix = ''
-				}
+		'9.2' : {
+			$initdSuffix = '-9.2'
 		}
-	
+		default : {
+			$initdSuffix = ''
+		}
+	}
 	if $clean {
 		exec {
 			"reinitialize_pgsql_server" :
-				command => "/etc/init.d/postgresql$initdSuffix stop; rm -rf $confpath ; /etc/init.d/postgresql$initdSuffix initdb",
+				command =>
+				"/etc/init.d/postgresql$initdSuffix stop; rm -rf $confpath ; /etc/init.d/postgresql$initdSuffix initdb",
 				path => ["/bin", "/sbin"],
 				cwd => "/var",
 				require => Package[$pkgname],
@@ -80,9 +78,13 @@ class postgresql::server ($version = '8.4',
 		$srv_subscriptions = [Package[$pkgname], File['pg_hba.conf'],
 		File['postgresql.conf']]
 	}
+	$pghba_dir = $conf_pghba_dir ? {
+		'standard' => $confpath,
+		default => $conf_pghba_dir,
+	}
 	file {
 		'pg_hba.conf' :
-			path => "$confpath/pg_hba.conf",
+			path => "$pghba_dir/pg_hba.conf",
 			content => template('postgresql/pg_hba.conf.erb'),
 			mode => '0640',
 			require => [Package[$pkgname], Exec["reinitialize_pgsql_server"]]
