@@ -3,6 +3,7 @@ class postgresql::server ($version = '8.4',
 	$max_connections = 100,
 	$shared_buffers = '24MB',
 	$package_to_install = '',
+	$package_client_to_install = undef,
 	$clean = false,
 	$pg_hba_access_rules =
 	['local   all         all                               ident',
@@ -27,9 +28,11 @@ class postgresql::server ($version = '8.4',
 	class {
 		'postgresql::client' :
 			version => $version,
+			package_client_to_install => $package_client_to_install,
 	}
-	Class['postgresql::server'] -> Class['postgresql::client'] if
-	$package_to_install == '' {
+#	Class['postgresql::server'] -> Class['postgresql::client'] 
+	
+	if $package_to_install == '' {
 		$pkgname = $::operatingsystem ? {
 			'redhat' => "postgresql-server",
 			'centos' => "postgresql-server",
