@@ -59,10 +59,14 @@ class postgresql::server ($version = '8.4',
 		}
 	}
 	if $clean {
+	  $confdatadir = $conf_data_dir ? {
+	    'standard' => '',
+	     default => " ; rm -rf $conf_data_dir",
+	  }
 		exec {
 			"reinitialize_pgsql_server" :
 				command =>
-				"/etc/init.d/postgresql$initdSuffix stop; rm -rf $confpath ; /etc/init.d/postgresql$initdSuffix initdb",
+				"/etc/init.d/postgresql$initdSuffix stop; rm -rf $confpath$confdatadir ; /etc/init.d/postgresql$initdSuffix initdb",
 				path => ["/bin", "/sbin"],
 				cwd => "/var",
 				require => Package[$pkgname],
