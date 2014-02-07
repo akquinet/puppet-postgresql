@@ -1,5 +1,5 @@
 name         'akquinet-postgresql'
-version      '1.1.0'
+version      '1.1.1'
 source       'https://github.com/akquinet/puppet-postgresql.git'
 author       'saheba'
 license      'ASL 2.0'
